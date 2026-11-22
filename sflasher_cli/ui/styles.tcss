@@ -1,35 +1,290 @@
+/* ShlepaFlash CLI - base styles */
 Screen {
   layout: vertical;
+  background: #111111;
+  color: #f3f3f3;
 }
+
+Header {
+  background: #181818;
+  color: #f3f3f3;
+  dock: top;
+}
+
+Footer {
+  background: #181818;
+  color: #aaaaaa;
+  dock: bottom;
+}
+
 #boot {
   align: center middle;
   height: 100%;
+  width: 100%;
+  background: #111111;
 }
+
 #logo {
+  width: 100%;
   text-align: center;
+  content-align: center middle;
+  color: #ff6a00;
+  margin-bottom: 1;
+  overflow: hidden;
+}
+
+#boot-status {
+  width: 100%;
+  text-align: center;
+  color: #aaaaaa;
+  margin-top: 1;
+}
+
+#boot-bar {
+  width: 100%;
+  text-align: center;
+  content-align: center middle;
+  margin-top: 1;
+  height: auto;
+}
+
+#main-wrap {
+  align: center middle;
+  height: 1fr;
+  width: 100%;
+  padding: 1 2;
+}
+
+#menu-box, #flash-box {
+  width: 72;
+  max-width: 96%;
+  height: auto;
+  max-height: 92%;
+  background: #1a1a1a;
+  border: round #333333;
+  padding: 1 2;
+}
+
+#flash-box {
+  width: 76;
+}
+
+.menu-title {
+  width: 100%;
+  text-align: center;
+  text-style: bold;
+  color: #ff6a00;
   margin-bottom: 1;
 }
-#boot-status { text-align: center; color: #aaa; }
-#boot-bar { width: 60; margin-top: 1; }
-#main-wrap { align: center middle; height: 1fr; }
-#menu-box { width: 70; max-width: 90%; border: solid #444; padding: 1 2; background: #1a1a1a; }
-.menu-title { text-align: center; margin-bottom: 1; }
-Button.menu-btn { width: 100%; margin: 0 0 1 0; }
-Button.exit-btn { width: 100%; margin-top: 1; border: solid #ff4d4d; color: #ff4d4d; background: #1a1a1a; }
-Button.exit-btn:hover { background: #ff4d4d; color: white; }
-.panel-title { text-style: bold; margin-bottom: 1; }
-.small { color: #aaaaaa; }
-.device-list, .fw-list, .port-list { height: 1fr; border: solid #333; }
-.info-box { border: solid #333; padding: 1; margin-top: 1; height: auto; }
-#flash-wrap { align: center middle; height: 1fr; }
-#flash-box { width: 80; max-width: 95%; border: solid #444; padding: 1 2; background: #1a1a1a; }
-#flash-percent { text-align: center; text-style: bold; height: 3; content-align: center middle; }
-#flash-stage { text-align: center; color: #aaa; margin-top: 1; }
-#flash-bar { margin-top: 1; }
-#logs-modal, #settings-modal { align: center middle; }
-.dialog { width: 90; max-width: 95%; max-height: 90%; border: solid #ff6a00; background: #1a1a1a; padding: 1 2; }
-.dialog-wide { width: 110; max-width: 96%; max-height: 92%; border: solid #ff6a00; background: #1a1a1a; padding: 1 2; }
-#log-text { height: 1fr; border: solid #333; }
-.modal-actions { height: auto; margin-top: 1; align-horizontal: right; }
-.modal-actions Button { margin-left: 1; }
-.setting-row { height: auto; margin-bottom: 1; }
+
+.panel-title {
+  width: 100%;
+  text-align: center;
+  text-style: bold;
+  color: #ff6a00;
+  margin-bottom: 1;
+}
+
+.small {
+  color: #aaaaaa;
+  text-align: center;
+  width: 100%;
+  height: auto;
+}
+
+Button {
+  width: 100%;
+  min-width: 16;
+  height: 3;
+  margin: 0 0 1 0;
+  background: #222222;
+  color: #f3f3f3;
+  border: round #3a3a3a;
+  text-style: bold;
+}
+
+Button:hover {
+  background: #2a2a2a;
+  border: round #ff6a00;
+  color: #ff6a00;
+}
+
+Button:focus {
+  border: round #ff6a00;
+}
+
+Button.-primary {
+  background: #ff6a00;
+  color: #111111;
+  border: round #ff6a00;
+}
+
+Button.-primary:hover {
+  background: #ff7f22;
+  color: #111111;
+  border: round #ff7f22;
+}
+
+Button.menu-btn {
+  width: 100%;
+  margin-bottom: 1;
+}
+
+Button.exit-btn, Button#flash-cancel {
+  background: #221616;
+  color: #ff5a5a;
+  border: round #663333;
+}
+
+Button.exit-btn:hover, Button#flash-cancel:hover {
+  background: #ff4d4d;
+  color: #ffffff;
+  border: round #ff4d4d;
+}
+
+.modal-actions {
+  width: 100%;
+  height: auto;
+  align: right middle;
+  margin-top: 1;
+}
+
+.modal-actions Button {
+  width: auto;
+  min-width: 14;
+  margin: 0 0 0 1;
+}
+
+.setting-row {
+  width: 100%;
+  height: auto;
+  margin-bottom: 1;
+}
+
+.setting-row Button {
+  width: 1fr;
+  margin: 0 1 0 0;
+}
+
+.setting-row Button:last-child {
+  margin-right: 0;
+}
+
+.device-list, .fw-list, .port-list {
+  height: 12;
+  min-height: 8;
+  max-height: 16;
+  border: round #333333;
+  background: #151515;
+  margin: 1 0;
+}
+
+ListView > ListItem {
+  padding: 0 1;
+  color: #f3f3f3;
+}
+
+ListView > ListItem:hover {
+  background: #252525;
+}
+
+ListView > ListItem.--highlight {
+  background: #2b1d12;
+  color: #ff8a2a;
+  text-style: bold;
+}
+
+.info-box {
+  width: 100%;
+  height: auto;
+  min-height: 3;
+  border: round #333333;
+  background: #151515;
+  padding: 1;
+  margin-top: 1;
+  color: #dddddd;
+}
+
+#flash-wrap {
+  align: center middle;
+  height: 1fr;
+  width: 100%;
+  padding: 1 2;
+}
+
+#flash-percent {
+  width: 100%;
+  text-align: center;
+  content-align: center middle;
+  text-style: bold;
+  color: #ff6a00;
+  height: 3;
+  margin-top: 1;
+}
+
+#flash-stage {
+  width: 100%;
+  text-align: center;
+  color: #aaaaaa;
+  margin-top: 0;
+  margin-bottom: 1;
+}
+
+#flash-bar {
+  width: 100%;
+  margin: 1 0;
+}
+
+ProgressBar {
+  padding: 0 1;
+}
+
+ProgressBar > Bar {
+  width: 1fr;
+}
+
+#flash-result {
+  min-height: 5;
+}
+
+.dialog, .dialog-wide {
+  width: 84;
+  max-width: 96%;
+  max-height: 90%;
+  height: auto;
+  background: #1a1a1a;
+  border: round #ff6a00;
+  padding: 1 2;
+}
+
+.dialog-wide {
+  width: 100;
+}
+
+#log-text {
+  height: 14;
+  min-height: 8;
+  border: round #333333;
+  background: #111111;
+  padding: 1;
+  overflow-y: auto;
+}
+
+Checkbox {
+  margin: 1 0 0 0;
+  height: auto;
+  color: #f3f3f3;
+}
+
+Checkbox:hover {
+  color: #ff8a2a;
+}
+
+#catalog-status, #port-info, #flash-result {
+  text-align: left;
+}
+
+#theme-preview {
+  margin-top: 1;
+  color: #aaaaaa;
+}

@@ -408,13 +408,14 @@ class HomeScreen(Screen):
         yield Header(show_clock=False)
         with Container(id="main-wrap"):
             with Vertical(id="menu-box"):
-                yield Static(load_logo(), id="logo")
-                yield Static(t("app_title", lang), classes="menu-title")
-                yield Button(f"🔥 {t('flash_device', lang)}", id="go-flash", classes="menu-btn", variant="primary")
-                yield Button(f"⚙️ {t('settings', lang)}", id="go-settings", classes="menu-btn")
-                yield Button(f"📋 {t('logs', lang)}", id="go-logs", classes="menu-btn")
-                yield Button(f"❌ {t('exit', lang)}", id="go-exit", classes="exit-btn")
-                yield Static(f"v{__version__} · sflasher.bot.nu", classes="small")
+                yield Static(Text(load_logo(), style="bold #ff6a00"), id="logo")
+                yield Static("Terminal flasher for ESP32 devices" if lang == "en" else "Терминальный флешер для ESP32 устройств", classes="small")
+                yield Static(" ")
+                yield Button(f"🔥  {t('flash_device', lang)}", id="go-flash", classes="menu-btn", variant="primary")
+                yield Button(f"⚙️  {t('settings', lang)}", id="go-settings", classes="menu-btn")
+                yield Button(f"📋  {t('logs', lang)}", id="go-logs", classes="menu-btn")
+                yield Button(f"❌  {t('exit', lang)}", id="go-exit", classes="exit-btn")
+                yield Static(f"v{__version__}  •  sflasher.bot.nu", classes="small")
         yield Footer()
 
     @on(Button.Pressed, "#go-flash")
@@ -988,7 +989,8 @@ class BootScreen(Screen):
     def _show_logo(self):
         self.query_one("#boot-bar", Static).update("")
         self.query_one("#boot-status", Static).update("")
-        self.query_one("#logo", Static).update(Text(load_logo(), style="#ff6a00"))
+        theme = resolve_theme(STATE.settings.theme)
+        self.query_one("#logo", Static).update(Text(load_logo(), style=f"bold {theme.accent}"))
         self.set_timer(0.8 if STATE.settings.animations else 0.05, self.finish)
 
     def finish(self):
@@ -1014,15 +1016,28 @@ class SFlasherApp(App):
         css = (Path(__file__).resolve().parent / "ui" / "styles.tcss").read_text(encoding="utf-8")
         extra = f"""
 Screen {{ background: {theme.bg}; color: {theme.text}; }}
-#menu-box, .dialog, .dialog-wide, #flash-box {{ background: {theme.panel}; border: solid {theme.border}; }}
-Button {{ background: {theme.panel_alt}; color: {theme.text}; border: solid {theme.border}; }}
-Button:hover {{ border: solid {theme.accent}; color: {theme.accent}; }}
-Button.-primary, Button#conn-flash, Button#prep-next {{ background: {theme.accent}; color: {theme.accent_text}; border: solid {theme.accent}; }}
-Button.exit-btn, Button#flash-cancel {{ color: {theme.danger}; border: solid {theme.danger}; background: {theme.panel_alt}; }}
-Button.exit-btn:hover, Button#flash-cancel:hover {{ background: {theme.danger}; color: white; }}
-.small, #boot-status, #flash-stage {{ color: {theme.muted}; }}
-#flash-percent {{ color: {theme.accent}; }}
-ProgressBar > .bar--bar {{ color: {theme.accent}; }}
+Header {{ background: {theme.panel}; color: {theme.text}; }}
+Footer {{ background: {theme.panel}; color: {theme.muted}; }}
+ModalScreen {{ align: center middle; background: {theme.bg} 70%; }}
+#boot {{ background: {theme.bg}; }}
+#menu-box, #flash-box, .dialog, .dialog-wide {{ background: {theme.panel}; border: round {theme.border}; }}
+#logo, .panel-title, .menu-title, #flash-percent {{ color: {theme.accent}; }}
+.small, #boot-status, #flash-stage, #catalog-status {{ color: {theme.muted}; }}
+Button {{ background: {theme.panel_alt}; color: {theme.text}; border: round {theme.border}; }}
+Button:hover {{ background: {theme.panel_alt}; border: round {theme.accent}; color: {theme.accent}; }}
+Button:focus {{ border: round {theme.accent}; }}
+Button.-primary, Button#conn-flash, Button#prep-next, Button#go-flash, Button#close-settings, Button#close-logs, Button#upd-do {{ background: {theme.accent}; color: {theme.accent_text}; border: round {theme.accent}; }}
+Button.-primary:hover, Button#conn-flash:hover, Button#prep-next:hover, Button#go-flash:hover, Button#close-settings:hover, Button#close-logs:hover, Button#upd-do:hover {{ background: {theme.accent}; color: {theme.accent_text}; border: round {theme.accent}; text-style: bold; }}
+Button.exit-btn, Button#flash-cancel {{ background: {theme.panel_alt}; color: {theme.danger}; border: round {theme.danger}; }}
+Button.exit-btn:hover, Button#flash-cancel:hover {{ background: {theme.danger}; color: #ffffff; border: round {theme.danger}; }}
+ListView, .device-list, .fw-list, .port-list, .info-box, #log-text {{ background: {theme.bg}; border: round {theme.border}; color: {theme.text}; }}
+ListView > ListItem:hover {{ background: {theme.panel_alt}; }}
+ListView > ListItem.--highlight {{ background: {theme.panel_alt}; color: {theme.accent}; }}
+Checkbox {{ color: {theme.text}; }}
+Checkbox:hover {{ color: {theme.accent}; }}
+ProgressBar Bar > .bar--bar {{ color: {theme.accent}; }}
+ProgressBar Bar > .bar--complete {{ color: {theme.accent}; }}
+#flash-result {{ color: {theme.text}; }}
 """
         self.CSS = css + "\n" + extra
         try:
