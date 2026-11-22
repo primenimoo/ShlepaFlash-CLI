@@ -33,7 +33,7 @@ from .i18n import t
 from .logger import AppLogger
 from .serial_manager import SerialManager
 from .theme import THEMES, THEME_ORDER, resolve_theme, theme_css
-from .updater import check_update
+from .updater import check_update, perform_update, relaunch_app, UpdateInfo
 
 log = logging.getLogger("sflasher.app")
 
@@ -78,6 +78,8 @@ class State:
         self.erase_before_flash = self.settings.erase_before_flash
         self.install_components = self.settings.install_components
         self.last_flash_result: dict[str, Any] | None = None
+        self.update_info: UpdateInfo | None = None
+        self.relaunch_after_update = False
 
 
 STATE = State()
@@ -170,6 +172,108 @@ class LogsModal(ModalScreen):
             self.notify(f"Логи сохранены: {p}")
 
 
+
+class UpdateModal(ModalScreen):
+    BINDINGS = [Binding("escape", "close", "Close")]
+
+    def __init__(self, state: State, info: UpdateInfo):
+        super().__init__()
+        self.state = state
+        self.info = info
+        self._updating = False
+
+    def compose(self) -> ComposeResult:
+        lang = self.state.settings.language
+        title = "Доступно обновление" if lang == "ru" else "Update available"
+        cur = f"Текущая версия: {self.info.current}" if lang == "ru" else f"Current version: {self.info.current}"
+        new = f"Новая версия: {self.info.latest}" if lang == "ru" else f"New version: {self.info.latest}"
+        with Container(classes="dialog"):
+            yield Static("🐾 ShlepaFlash CLI", classes="panel-title")
+            yield Static(title, classes="panel-title")
+            yield Static(cur, classes="small")
+            yield Static(new)
+            if self.info.notes:
+                yield Static(self.info.notes[:300], classes="small")
+            yield Static("", id="upd-status", classes="small")
+            yield ProgressBar(total=100, show_eta=False, id="upd-bar")
+            with Horizontal(classes="modal-actions"):
+                yield Button("Не сейчас" if lang == "ru" else "Not now", id="upd-later")
+                yield Button("Обновить" if lang == "ru" else "Update", id="upd-do", variant="primary")
+
+    def on_mount(self) -> None:
+        try:
+            self.query_one("#upd-bar", ProgressBar).update(progress=0)
+        except Exception:
+            pass
+
+    @on(Button.Pressed, "#upd-later")
+    def action_close(self):
+        if not self._updating:
+            self.dismiss(False)
+
+    @on(Button.Pressed, "#upd-do")
+    def do_update(self):
+        if self._updating:
+            return
+        self._updating = True
+        self.query_one("#upd-later", Button).disabled = True
+        self.query_one("#upd-do", Button).disabled = True
+        self.query_one("#upd-status", Static).update("Обновление..." if self.state.settings.language == "ru" else "Updating...")
+        self.query_one("#upd-bar", ProgressBar).update(progress=15)
+        self.run_update()
+
+    @work(thread=True)
+    def run_update(self) -> None:
+        def cb(msg):
+            self.app.call_from_thread(self._status, msg)
+        try:
+            self.app.call_from_thread(self._progress, 30)
+            ok, msg = perform_update(log_cb=cb)
+            self.app.call_from_thread(self._progress, 90 if ok else 100)
+            if ok:
+                self.state.relaunch_after_update = True
+                self.app.call_from_thread(self._status, "Обновление установлено. Перезапуск..." if self.state.settings.language == "ru" else "Update installed. Restarting...")
+                self.app.call_from_thread(self._progress, 100)
+                import time as _t
+                _t.sleep(0.8)
+                self.app.call_from_thread(self._finish_ok)
+            else:
+                self.app.call_from_thread(self._status, f"Ошибка обновления: {msg}")
+                self.app.call_from_thread(self._unlock)
+        except Exception as e:
+            self.app.call_from_thread(self._status, f"Ошибка: {e}")
+            self.app.call_from_thread(self._unlock)
+
+    def _status(self, msg: str):
+        try:
+            self.query_one("#upd-status", Static).update(str(msg)[:300])
+        except Exception:
+            pass
+
+    def _progress(self, v: int):
+        try:
+            self.query_one("#upd-bar", ProgressBar).update(progress=v)
+        except Exception:
+            pass
+
+    def _unlock(self):
+        self._updating = False
+        try:
+            self.query_one("#upd-later", Button).disabled = False
+            self.query_one("#upd-do", Button).disabled = False
+        except Exception:
+            pass
+
+    def _finish_ok(self):
+        try:
+            self.dismiss(True)
+        except Exception:
+            pass
+        try:
+            self.app.exit()
+        except Exception:
+            pass
+
 class SettingsModal(ModalScreen):
     BINDINGS = [Binding("escape", "close", "Close")]
 
@@ -194,7 +298,7 @@ class SettingsModal(ModalScreen):
             yield Static(f"{t('logging', lang)}: {'ON' if s.logging_enabled else 'OFF'}", id="set-log")
             yield Horizontal(Button("Toggle logging", id="log-toggle"), classes="setting-row")
             yield Static(f"{t('check_updates', lang)}: {'ON' if s.check_updates else 'OFF'}", id="set-upd")
-            yield Horizontal(Button("Toggle updates", id="upd-toggle"), classes="setting-row")
+            yield Horizontal(Button("Toggle updates", id="upd-toggle"), Button("Проверить сейчас" if lang=='ru' else 'Check now', id="upd-now"), classes="setting-row")
             yield Static("Theme preview: ■■■■", id="theme-preview")
             with Horizontal(classes="modal-actions"):
                 yield Button(t("close", lang), id="close-settings", variant="primary")
@@ -271,6 +375,27 @@ class SettingsModal(ModalScreen):
         s = self.state.settings
         s.check_updates = not s.check_updates
         s.save(); self.refresh_labels()
+
+    @on(Button.Pressed, "#upd-now")
+    def upd_now(self):
+        self.notify("Проверка обновлений..." if self.state.settings.language == 'ru' else 'Checking updates...')
+        self.run_update_check()
+
+    @work(thread=True)
+    def run_update_check(self):
+        try:
+            info = check_update()
+        except Exception:
+            info = None
+        def _ui():
+            if not info:
+                self.notify("Не удалось проверить обновления" if self.state.settings.language=='ru' else 'Update check failed', severity='warning')
+                return
+            if info.available:
+                self.app.push_screen(UpdateModal(self.state, info))
+            else:
+                self.notify(f"У вас актуальная версия ({info.current})" if self.state.settings.language=='ru' else f"You are up to date ({info.current})")
+        self.app.call_from_thread(_ui)
 
     @on(Button.Pressed, "#close-settings")
     def action_close(self):
@@ -914,15 +1039,26 @@ ProgressBar > .bar--bar {{ color: {theme.accent}; }}
     def check_updates_bg(self) -> None:
         if not STATE.settings.check_updates:
             return
-        info = check_update()
+        try:
+            info = check_update()
+        except Exception:
+            return
         if info and info.available:
-            self.call_from_thread(self.notify, f"Доступно обновление: {info.latest} ({info.url})", severity="information")
+            STATE.update_info = info
+            def _show():
+                try:
+                    self.push_screen(UpdateModal(STATE, info))
+                except Exception:
+                    self.notify(f"Доступно обновление: {info.latest}", severity="information")
+            self.call_from_thread(_show)
 
 
 def run() -> int:
     try:
         app = SFlasherApp()
         app.run(mouse=True)
+        if STATE.relaunch_after_update:
+            relaunch_app()
         return 0
     except KeyboardInterrupt:
         return 130
