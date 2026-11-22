@@ -512,7 +512,7 @@ class DeviceScreen(Screen):
         self.app.pop_screen()
 
     @on(Button.Pressed, "#dev-refresh")
-    def refresh(self):
+    def refresh_catalog(self):
         STATE.catalog = None
         self.load_catalog(force=True)
 
