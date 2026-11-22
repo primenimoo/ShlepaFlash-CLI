@@ -166,7 +166,7 @@ Button.exit-btn:hover, Button#flash-cancel:hover {
   margin: 0 1 0 0;
 }
 
-.setting-row Button:last-child {
+.setting-row Button:last-of-type {
   margin-right: 0;
 }
 
