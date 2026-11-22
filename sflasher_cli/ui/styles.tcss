@@ -1,0 +1,35 @@
+Screen {
+  layout: vertical;
+}
+#boot {
+  align: center middle;
+  height: 100%;
+}
+#logo {
+  text-align: center;
+  margin-bottom: 1;
+}
+#boot-status { text-align: center; color: #aaa; }
+#boot-bar { width: 60; margin-top: 1; }
+#main-wrap { align: center middle; height: 1fr; }
+#menu-box { width: 70; max-width: 90%; border: solid #444; padding: 1 2; background: #1a1a1a; }
+.menu-title { text-align: center; margin-bottom: 1; }
+Button.menu-btn { width: 100%; margin: 0 0 1 0; }
+Button.exit-btn { width: 100%; margin-top: 1; border: solid #ff4d4d; color: #ff4d4d; background: #1a1a1a; }
+Button.exit-btn:hover { background: #ff4d4d; color: white; }
+.panel-title { text-style: bold; margin-bottom: 1; }
+.small { color: #aaaaaa; }
+.device-list, .fw-list, .port-list { height: 1fr; border: solid #333; }
+.info-box { border: solid #333; padding: 1; margin-top: 1; height: auto; }
+#flash-wrap { align: center middle; height: 1fr; }
+#flash-box { width: 80; max-width: 95%; border: solid #444; padding: 1 2; background: #1a1a1a; }
+#flash-percent { text-align: center; text-style: bold; height: 3; content-align: center middle; }
+#flash-stage { text-align: center; color: #aaa; margin-top: 1; }
+#flash-bar { margin-top: 1; }
+#logs-modal, #settings-modal { align: center middle; }
+.dialog { width: 90; max-width: 95%; max-height: 90%; border: solid #ff6a00; background: #1a1a1a; padding: 1 2; }
+.dialog-wide { width: 110; max-width: 96%; max-height: 92%; border: solid #ff6a00; background: #1a1a1a; padding: 1 2; }
+#log-text { height: 1fr; border: solid #333; }
+.modal-actions { height: auto; margin-top: 1; align-horizontal: right; }
+.modal-actions Button { margin-left: 1; }
+.setting-row { height: auto; margin-bottom: 1; }
