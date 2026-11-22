@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "shlepaflash-cli"
-version = "1.0.2"
+version = "1.0.3"
 description = "ShlepaFlash CLI — cross-platform terminal flasher for ESP32 devices"
 readme = "README.md"
 requires-python = ">=3.10"

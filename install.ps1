@@ -1,5 +1,5 @@
 # ShlepaFlash CLI Installer for Windows
-$ErrorActionPreference = "Stop"
+$ErrorActionPreference = "Continue"
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $RepoUrl = if ($env:SFLASHER_REPO_URL) { $env:SFLASHER_REPO_URL } else { "https://github.com/primenimoo/ShlepaFlash-CLI.git" }
 $InstallDir = if ($env:SFLASHER_INSTALL_DIR) { $env:SFLASHER_INSTALL_DIR } else { Join-Path $HOME ".shlepaflash-cli" }
@@ -38,11 +38,8 @@ try {
   New-Item -ItemType Directory -Force -Path $InstallDir, $BinDir | Out-Null
 
   function Invoke-Native($cmd, $cmdArgs) {
-    $prev = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
     & $cmd @cmdArgs 2>&1 | ForEach-Object { $_.ToString() } | Out-File -Append -FilePath $LogFile
-    $code = $LASTEXITCODE
-    $ErrorActionPreference = $prev
-    return $code
+    return $LASTEXITCODE
   }
 
   Show-Bar 30 "Загрузка исходников"
