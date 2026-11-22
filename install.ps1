@@ -37,27 +37,35 @@ try {
   Show-Bar 15 "Подготовка каталогов"
   New-Item -ItemType Directory -Force -Path $InstallDir, $BinDir | Out-Null
 
+  function Invoke-Native($cmd, $cmdArgs) {
+    $prev = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
+    & $cmd @cmdArgs 2>&1 | ForEach-Object { $_.ToString() } | Out-File -Append -FilePath $LogFile
+    $code = $LASTEXITCODE
+    $ErrorActionPreference = $prev
+    return $code
+  }
+
   Show-Bar 30 "Загрузка исходников"
   if (Test-Path (Join-Path $RepoDir ".git")) {
-    & git -C $RepoDir fetch --depth 1 origin main 2>&1 | Out-File -Append -FilePath $LogFile
-    & git -C $RepoDir reset --hard origin/main 2>&1 | Out-File -Append -FilePath $LogFile
+    [void](Invoke-Native "git" @("-C", $RepoDir, "fetch", "--depth", "1", "origin", "main"))
+    [void](Invoke-Native "git" @("-C", $RepoDir, "reset", "--hard", "origin/main"))
   } else {
     if (Test-Path $RepoDir) { Remove-Item -Recurse -Force $RepoDir }
-    & git clone --depth 1 --branch main $RepoUrl $RepoDir 2>&1 | Out-File -Append -FilePath $LogFile
+    $code = Invoke-Native "git" @("clone", "--depth", "1", "--branch", "main", $RepoUrl, $RepoDir)
+    if ($code -ne 0) { throw "Не удалось скачать репозиторий. Лог: $LogFile" }
   }
-  if ($LASTEXITCODE -ne 0) { throw "Не удалось скачать репозиторий. Лог: $LogFile" }
 
   Show-Bar 55 "Создание окружения"
   if (-not (Test-Path (Join-Path $VenvDir "Scripts\python.exe"))) {
-    if ($pyCmd -eq "python") { & python -m venv $VenvDir 2>&1 | Out-File -Append -FilePath $LogFile } else { & py -3 -m venv $VenvDir 2>&1 | Out-File -Append -FilePath $LogFile }
-    if ($LASTEXITCODE -ne 0) { throw "Не удалось создать venv. Лог: $LogFile" }
+    if ($pyCmd -eq "python") { $code = Invoke-Native "python" @("-m","venv",$VenvDir) } else { $code = Invoke-Native "py" @("-3","-m","venv",$VenvDir) }
+    if ($code -ne 0) { throw "Не удалось создать venv. Лог: $LogFile" }
   }
 
   Show-Bar 75 "Установка пакета"
   $venvPy = Join-Path $VenvDir "Scripts\python.exe"
-  & $venvPy -m pip install --upgrade pip --disable-pip-version-check 2>&1 | Out-File -Append -FilePath $LogFile
-  & $venvPy -m pip install --upgrade --force-reinstall $RepoDir --disable-pip-version-check 2>&1 | Out-File -Append -FilePath $LogFile
-  if ($LASTEXITCODE -ne 0) { throw "Не удалось установить пакет. Лог: $LogFile" }
+  [void](Invoke-Native $venvPy @("-m","pip","install","--upgrade","pip","--disable-pip-version-check"))
+  $code = Invoke-Native $venvPy @("-m","pip","install","--upgrade","--force-reinstall",$RepoDir,"--disable-pip-version-check")
+  if ($code -ne 0) { throw "Не удалось установить пакет. Лог: $LogFile" }
 
   Show-Bar 90 "Создание команды sflasher"
   $launcherCmd = Join-Path $BinDir "sflasher.cmd"
