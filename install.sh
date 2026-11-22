@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_URL="${SFLASHER_REPO_URL:-https://github.com/primenimoo-alt/ShlepaFlash-CLI.git}"
+REPO_URL="${SFLASHER_REPO_URL:-https://github.com/primenimoo/ShlepaFlash-CLI.git}"
 INSTALL_DIR="${SFLASHER_INSTALL_DIR:-$HOME/.local/share/shlepaflash-cli}"
 BIN_DIR="${SFLASHER_BIN_DIR:-$HOME/.local/bin}"
 VENV_DIR="$INSTALL_DIR/venv"

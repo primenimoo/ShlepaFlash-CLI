@@ -1,5 +1,5 @@
 $ErrorActionPreference = "Stop"
-$RepoUrl = if ($env:SFLASHER_REPO_URL) { $env:SFLASHER_REPO_URL } else { "https://github.com/primenimoo-alt/ShlepaFlash-CLI.git" }
+$RepoUrl = if ($env:SFLASHER_REPO_URL) { $env:SFLASHER_REPO_URL } else { "https://github.com/primenimoo/ShlepaFlash-CLI.git" }
 $InstallDir = if ($env:SFLASHER_INSTALL_DIR) { $env:SFLASHER_INSTALL_DIR } else { Join-Path $HOME ".shlepaflash-cli" }
 $BinDir = if ($env:SFLASHER_BIN_DIR) { $env:SFLASHER_BIN_DIR } else { Join-Path $HOME ".local\bin" }
 $VenvDir = Join-Path $InstallDir "venv"

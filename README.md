@@ -88,19 +88,19 @@ Use the app to see the live, device-compatible list.
 #### Linux / macOS (shell)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/primenimoo-alt/ShlepaFlash-CLI/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/primenimoo/ShlepaFlash-CLI/main/install.sh | bash
 ```
 
 #### Windows (PowerShell)
 
 ```powershell
-irm https://raw.githubusercontent.com/primenimoo-alt/ShlepaFlash-CLI/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/primenimoo/ShlepaFlash-CLI/main/install.ps1 | iex
 ```
 
 #### Manual install (all OS)
 
 ```bash
-git clone https://github.com/primenimoo-alt/ShlepaFlash-CLI.git
+git clone https://github.com/primenimoo/ShlepaFlash-CLI.git
 cd ShlepaFlash-CLI
 python -m venv .venv
 # Linux/macOS
@@ -213,13 +213,13 @@ MIT — see [LICENSE](./LICENSE).
 #### Linux / macOS
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/primenimoo-alt/ShlepaFlash-CLI/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/primenimoo/ShlepaFlash-CLI/main/install.sh | bash
 ```
 
 #### Windows PowerShell
 
 ```powershell
-irm https://raw.githubusercontent.com/primenimoo-alt/ShlepaFlash-CLI/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/primenimoo/ShlepaFlash-CLI/main/install.ps1 | iex
 ```
 
 ### Запуск

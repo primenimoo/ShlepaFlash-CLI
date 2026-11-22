@@ -8,7 +8,7 @@ import requests
 from . import __version__
 
 log = logging.getLogger("sflasher.updater")
-GITHUB_LATEST = "https://api.github.com/repos/primenimoo-alt/ShlepaFlash-CLI/releases/latest"
+GITHUB_LATEST = "https://api.github.com/repos/primenimoo/ShlepaFlash-CLI/releases/latest"
 
 
 @dataclass
