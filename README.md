@@ -1,5 +1,3 @@
-# 🐾 ShlepaFlash CLI
-
 <p align="center">
   <img src="https://sflasher.bot.nu/shlepaflash-logo.svg" alt="ShlepaFlash" width="420">
 </p>
